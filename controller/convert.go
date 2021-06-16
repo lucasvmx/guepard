@@ -3,11 +3,13 @@ package controller
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"guepard/model"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 )
 
 var musicFolderName = "musicas"
@@ -74,7 +76,17 @@ func RequestConversion(videoInfo *model.IndexResponse) (status *model.ConvertSta
 	log.Printf("[INFO] Requesting video conversion to mp3 format ...")
 
 	postURL := model.GetBaseURL() + model.GetConversionPath()
-	resp, err := http.PostForm(postURL, url.Values{"vid": {videoInfo.Vid}, "k": {videoInfo.Kc}})
+	payload := fmt.Sprintf("vid=%v&k=%v", url.QueryEscape(videoInfo.Vid), url.QueryEscape(videoInfo.Kc))
+
+	// Build HTTP request
+	req, _ := http.NewRequest("POST", postURL, strings.NewReader(payload))
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("Content-Length", fmt.Sprintf("%d", len(payload)))
+	req.Header.Add("User-Agent", "Guepard/0.1")
+	req.Header.Add("Host", "yt1s.com")
+
+	// Send HTTP request
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Printf("[ERROR] Failed to request download: %v", err)
 		return

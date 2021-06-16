@@ -31,7 +31,11 @@ func DownloadMusic(videoInfo *model.ConvertStatus) {
 	}
 
 	// Read HTTP request body
-	body := readBody(resp)
+	body := readHTTPFile(resp)
+
+	if body != nil {
+		return
+	}
 
 	// Save music data into disk
 	localFilename := buildMusicFilename(videoInfo)
