@@ -54,6 +54,11 @@ func DoConversion(filename string) {
 		// Get video information
 		videoInfo := GetVideoInformation(remoteURL)
 
+		if videoInfo.Mess != "" {
+			log.Printf("[ERROR] %v", videoInfo.Mess)
+			continue
+		}
+
 		// Request conversion to mp3
 		conversionStatus := RequestConversion(videoInfo)
 
